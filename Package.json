@@ -1,0 +1,11 @@
+{
+  "name": "flight-price-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "discord.js": "^14.0.0",
+    "node-fetch": "^3.3.1",
+    "cron": "^2.0.0"
+  }
+}
