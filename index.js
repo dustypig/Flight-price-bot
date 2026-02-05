@@ -11,10 +11,46 @@ const client = new Discord.Client({
 
 // Variables d'environnement
 const channelId = process.env.CHANNEL_ID;
-const apiKey = process.env.FLIGHT_API_KEY;
+const apiKey = process.env.SKYSCANNER_API_KEY;
 const priceThreshold = parseInt(process.env.PRICE_THRESHOLD);
 
 // Fonction pour vérifier les prix du vol
+async function testSkyscannerAPI() {
+  console.log("🔑 Skyscanner API key:", apiKey);
+
+  const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create";
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: {
+          market: "AU",
+          locale: "en-US",
+          currency: "AUD",
+          queryLegs: [
+            {
+              originPlaceId: { iata: "SCL" },
+              destinationPlaceId: { iata: "EZE" },
+              date: { year: 2026, month: 3, day: 17 }
+            }
+          ],
+          cabinClass: "CABIN_CLASS_ECONOMY",
+          adults: 1
+        }
+      })
+    });
+
+    const data = await res.json();
+    console.log("✈️ Skyscanner test response:", data);
+  } catch (err) {
+    console.error("❌ Skyscanner test error:", err);
+  }
+}
 async function checkFlightPrice() {
   const origin = "SCL";       // Santiago
   const destination = "EZE";  // Buenos Aires
@@ -52,7 +88,8 @@ async function checkFlightPrice() {
 // Quand le bot est prêt
 client.on("ready", () => {
   console.log(`Connecté en tant que ${client.user.tag}`);
-
+// 🔎 TEST Skyscanner (temporaire)
+  testSkyscannerAPI()
   // Vérifie toutes les 6h
   cron.schedule("0 */6 * * *", () => {
     console.log("Vérification des prix...");
